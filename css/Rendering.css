@@ -36,7 +36,8 @@ body {
     max-width: 720px;
     background-color: var(--md-sys-color-surface-container);
     padding: 32px;
-    border-radius: 28px; /* MD3 规范超大圆角 */
+    border-radius: 28px;
+    box-sizing: border-box;
 }
 
 .header {
@@ -74,7 +75,7 @@ label {
     margin-bottom: 8px;
 }
 
-/* MD3 轮廓型输入框变体 */
+/* MD3 轮廓型输入框 */
 .input-group {
     display: flex;
     gap: 8px;
@@ -85,7 +86,7 @@ input[type="number"], select, .unit-suffix {
     box-sizing: border-box;
     padding: 0 16px;
     border: 1px solid var(--md-sys-color-outline);
-    border-radius: 4px; /* MD3 text field 规范 */
+    border-radius: 4px;
     font-size: 16px;
     background-color: var(--md-sys-color-surface);
     color: var(--md-sys-color-on-surface);
@@ -100,7 +101,7 @@ input[type="number"]:focus, select:focus {
     outline: none;
     border-color: var(--md-sys-color-primary);
     border-width: 2px;
-    padding: 0 15px; /* 补偿边框加粗导致的跳动 */
+    padding: 0 15px; /* 补偿边框加粗 */
 }
 
 .unit-suffix {
@@ -112,7 +113,7 @@ input[type="number"]:focus, select:focus {
     pointer-events: none;
 }
 
-/* MD3 胶囊按钮 (Filled Button) */
+/* MD3 胶囊按钮 */
 .md-button {
     display: flex;
     align-items: center;
@@ -124,7 +125,7 @@ input[type="number"]:focus, select:focus {
     background-color: var(--md-sys-color-primary);
     color: var(--md-sys-color-on-primary);
     border: none;
-    border-radius: 100px; /* 胶囊形状 */
+    border-radius: 100px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -159,7 +160,6 @@ input[type="number"]:focus, select:focus {
     color: var(--md-sys-color-on-surface);
 }
 
-/* 结果卡片容器 */
 .topology-card {
     background-color: var(--md-sys-color-surface-container-high);
     border-radius: 16px;
@@ -171,7 +171,7 @@ input[type="number"]:focus, select:focus {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 .topology-header span {
@@ -185,10 +185,23 @@ input[type="number"]:focus, select:focus {
     color: var(--md-sys-color-on-surface);
 }
 
-.note {
-    font-size: 14px;
-    color: var(--md-sys-color-on-surface-variant);
-    margin: 0 0 16px 0;
+/* 动态电路图容器 */
+.circuit-diagram {
+    width: 100%;
+    overflow-x: auto;
+    background-color: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.circuit-diagram svg {
+    min-width: max-content;
 }
 
 /* MD3 风格表格 */
@@ -226,7 +239,6 @@ strong {
     font-weight: 700;
 }
 
-/* 响应式适配 */
 @media (max-width: 600px) {
     .container {
         padding: 20px;
