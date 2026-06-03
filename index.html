@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-    <title>巴特沃斯低通滤波器计算器 - MD3</title> 
+    <title>巴特沃斯低通滤波器设计与反推工具 - MD3</title> 
     
     <!-- 引入 MD3 标准字体 Roboto 和 Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -12,99 +12,209 @@
     <link rel="stylesheet" href="./css/Rendering.css" /> 
 </head> 
 <body> 
-    <main class="container"> 
-        <div class="header">
-            <span class="material-symbols-outlined header-icon">graphic_eq</span>
-            <h1>巴特沃斯滤波器</h1> 
-            <p>输入设计参数，生成对应 LC 梯形网络的电感和电容值。</p> 
-        </div>
-
-        <div class="form-container">
-            <div class="form-group"> 
-                <label for="freq">截止频率 (fc)</label> 
-                <div class="input-group"> 
-                    <input type="number" id="freq" placeholder="例如: 10" step="any" required /> 
-                    <select id="freqUnit"> 
-                        <option value="1">Hz</option> 
-                        <option value="1e3">kHz</option> 
-                        <option value="1e6" selected>MHz</option> 
-                        <option value="1e9">GHz</option> 
-                    </select> 
-                </div> 
-            </div> 
-            
-            <div class="form-group"> 
-                <label for="impedance">特性阻抗 (Z0)</label> 
-                <div class="input-group"> 
-                    <input type="number" id="impedance" placeholder="例如: 50" value="50" step="any" required /> 
-                    <div class="unit-suffix">Ω (欧姆)</div>
-                </div> 
-            </div> 
-            
-            <div class="form-group"> 
-                <label for="order">滤波器阶数 (n)</label> 
-                <div class="input-group"> 
-                    <input type="number" id="order" placeholder="例如: 3" value="3" min="1" max="20" step="1" required /> 
-                </div> 
-            </div> 
-        </div>
-
-        <button class="md-button" onclick="calculateFilter()">
-            <span class="material-symbols-outlined">calculate</span>
-            计算参数
-        </button> 
+    <!-- 全局响应式双栏布局容器 -->
+    <main class="layout-grid"> 
         
-        <div class="results" id="results"> 
-            <h2>计算结果</h2> 
-            
-            <div class="topology-card"> 
-                <div class="topology-header">
-                    <span class="material-symbols-outlined">account_tree</span>
-                    <h3>拓扑结构 1：T型起始 (首元件串联电感)</h3> 
-                </div>
-                <!-- 动态电路图容器 -->
-                <div class="circuit-diagram" id="diagramTop1"></div>
+        <!-- ==================== 左侧栏：正向设计计算器 ==================== -->
+        <section class="container">
+            <div class="header">
+                <span class="material-symbols-outlined header-icon">graphic_eq</span>
+                <h1>正向滤波器设计</h1> 
+                <p>输入指标参数，自动生成 LC 电路拓扑图及元件数值。</p> 
+            </div>
 
-                <div class="table-container">
-                    <table id="tableTop1"> 
-                        <thead> 
-                            <tr> 
-                                <th>位号 (k)</th> 
-                                <th>元件类型</th> 
-                                <th>计算值</th> 
-                                <th>归一化 (gk)</th> 
-                            </tr> 
-                        </thead> 
-                        <tbody></tbody> 
-                    </table> 
-                </div>
-            </div> 
-            
-            <div class="topology-card"> 
-                <div class="topology-header">
-                    <span class="material-symbols-outlined">hub</span>
-                    <h3>拓扑结构 2：π型起始 (首元件并联电容)</h3> 
-                </div>
-                <!-- 动态电路图容器 -->
-                <div class="circuit-diagram" id="diagramTop2"></div>
+            <div class="form-container">
+                <div class="form-group"> 
+                    <label for="freq">截止频率 (fc)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="freq" placeholder="例如: 10" step="any" required /> 
+                        <select id="freqUnit"> 
+                            <option value="1">Hz</option> 
+                            <option value="1e3">kHz</option> 
+                            <option value="1e6" selected>MHz</option> 
+                            <option value="1e9">GHz</option> 
+                        </select> 
+                    </div> 
+                </div> 
+                
+                <div class="form-group"> 
+                    <label for="impedance">特性阻抗 (Z0)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="impedance" placeholder="例如: 50" value="50" step="any" required /> 
+                        <div class="unit-suffix">Ω</div>
+                    </div> 
+                </div> 
+                
+                <div class="form-group"> 
+                    <label for="orderForward">滤波器阶数 (n)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="orderForward" placeholder="例如: 3" value="3" min="1" max="20" step="1" required /> 
+                    </div> 
+                </div> 
+            </div>
 
-                <div class="table-container">
-                    <table id="tableTop2"> 
-                        <thead> 
-                            <tr> 
-                                <th>位号 (k)</th> 
-                                <th>元件类型</th> 
-                                <th>计算值</th> 
-                                <th>归一化 (gk)</th> 
-                            </tr> 
-                        </thead> 
-                        <tbody></tbody> 
-                    </table> 
-                </div>
+            <button class="md-button" onclick="calculateFilter()">
+                <span class="material-symbols-outlined">calculate</span>
+                生成计算结果
+            </button> 
+            
+            <div class="results" id="resultsForward"> 
+                <h2>正向设计结果</h2> 
+                
+                <div class="topology-card"> 
+                    <div class="topology-header">
+                        <span class="material-symbols-outlined">account_tree</span>
+                        <h3>拓扑结构 1：T型起始 (首元件串联电感)</h3> 
+                    </div>
+                    <!-- 电路图动态生成容器 -->
+                    <div class="circuit-diagram" id="diagramTop1"></div>
+                    <div class="table-container">
+                        <table id="tableTop1"> 
+                            <thead> 
+                                <tr> 
+                                    <th>位号 (k)</th> 
+                                    <th>元件类型</th> 
+                                    <th>计算值</th> 
+                                    <th>归一化 (gk)</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody></tbody> 
+                        </table> 
+                    </div>
+                </div> 
+                
+                <div class="topology-card"> 
+                    <div class="topology-header">
+                        <span class="material-symbols-outlined">hub</span>
+                        <h3>拓扑结构 2：π型起始 (首元件并联电容)</h3> 
+                    </div>
+                    <!-- 电路图动态生成容器 -->
+                    <div class="circuit-diagram" id="diagramTop2"></div>
+                    <div class="table-container">
+                        <table id="tableTop2"> 
+                            <thead> 
+                                <tr> 
+                                    <th>位号 (k)</th> 
+                                    <th>元件类型</th> 
+                                    <th>计算值</th> 
+                                    <th>归一化 (gk)</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody></tbody> 
+                        </table> 
+                    </div>
+                </div> 
             </div> 
-        </div> 
+
+            <!-- ================= 已恢复：左侧正向推算理论方法 ================= -->
+            <div class="theory-card" style="margin-top: 32px;">
+                <div class="topology-header">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    <h3>正向设计原理与方法</h3>
+                </div>
+                <div class="theory-content">
+                    <p class="theory-text"><strong>1. 最大平坦响应：</strong>巴特沃斯低通滤波器（Butterworth Filter）具有“最大平坦度”特性，其通带内频响最为平坦，无纹波；阻带内单调衰减（每阶衰减约为 -20dB/十倍频）。</p>
+                    <p class="theory-text"><strong>2. 归一化原型参数 (g<sub>k</sub>)：</strong>先计算截止频率为 1 rad/s、系统阻抗为 1 Ω 时的无量纲原型元件值：</p>
+                    <div class="formula-box">
+                        g<sub>k</sub> = 2 &times; sin <span class="bracket">(</span> <span class="fraction"><span>(2k - 1) &pi;</span><span class="divider"></span><span>2n</span></span> <span class="bracket">)</span>
+                    </div>
+                    <p class="theory-text"><strong>3. 标度变换（去归一化）：</strong>将归一化参数映射到实际截止角频率 <i>&omega;<sub>c</sub> = 2&pi;f<sub>c</sub></i> 与目标阻抗 <i>Z<sub>0</sub></i> 下，物理参数计算公式：</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="formula-box mini">L<sub>k</sub> = <span class="fraction"><span>g<sub>k</sub> &times; Z<sub>0</sub></span><span class="divider"></span><span>&omega;<sub>c</sub></span></span></div>
+                        <div class="formula-box mini">C<sub>k</sub> = <span class="fraction"><span>g<sub>k</sub></span><span class="divider"></span><span>Z<sub>0</sub> &times; &omega;<sub>c</sub></span></span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 右侧栏：逆向反推工具 ==================== -->
+        <section class="container">
+            <div class="header">
+                <span class="material-symbols-outlined header-icon">query_stats</span>
+                <h1>逆向参数反推</h1> 
+                <p>输入已知 LC 电路中的局部测量值，反向推算设计频率和阻抗。</p> 
+            </div>
+
+            <div class="form-container">
+                <div class="form-group"> 
+                    <label for="orderReverse">已知滤波器阶数 (n)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="orderReverse" placeholder="至少为 2" min="2" max="20" step="1" required /> 
+                    </div> 
+                </div> 
+                
+                <div class="form-group"> 
+                    <label>测量的电感 (L)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="posL" placeholder="从左数第几个元件? (如: 1)" min="1" step="1" style="flex: 1;" required /> 
+                        <input type="number" id="valL" placeholder="电感值" step="any" style="flex: 1;" required /> 
+                        <select id="unitL" style="flex: 0.6;"> 
+                            <option value="1e-12">pH</option> 
+                            <option value="1e-9" selected>nH</option> 
+                            <option value="1e-6">μH</option> 
+                            <option value="1e-3">mH</option> 
+                        </select> 
+                    </div> 
+                </div> 
+                
+                <div class="form-group"> 
+                    <label>测量的电容 (C)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="posC" placeholder="从左数第几个元件? (如: 2)" min="1" step="1" style="flex: 1;" required /> 
+                        <input type="number" id="valC" placeholder="电容值" step="any" style="flex: 1;" required /> 
+                        <select id="unitC" style="flex: 0.6;"> 
+                            <option value="1e-12" selected>pF</option> 
+                            <option value="1e-9">nF</option> 
+                            <option value="1e-6">μF</option> 
+                            <option value="1e-3">mF</option> 
+                        </select> 
+                    </div> 
+                </div> 
+            </div>
+
+            <button class="md-button" onclick="reverseCalculate()">
+                <span class="material-symbols-outlined">restart_alt</span>
+                执行逆向反推
+            </button> 
+            
+            <div class="results" id="resultsReverse"> 
+                <h2>反推解析结果</h2> 
+                <div class="result-highlight">
+                    <div class="result-box">
+                        <span class="label">逆向截止频率 (f<sub>c</sub>)</span>
+                        <span class="value" id="resFc">-</span>
+                    </div>
+                    <div class="result-box">
+                        <span class="label">逆向特性阻抗 (Z<sub>0</sub>)</span>
+                        <span class="value" id="resZ0">-</span>
+                    </div>
+                </div>
+                <p class="note" style="text-align: center; margin-top: 0;">提示：若反算频率含碎数，说明原设计极有可能使用了妥协的标准标称元器件。</p>
+            </div> 
+
+            <!-- ================= 已恢复并详化的：右侧逆向反推理论方法 ================= -->
+            <div class="theory-card" style="margin-top: 32px;">
+                <div class="topology-header">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    <h3>逆向反推原理与方法</h3>
+                </div>
+                <div class="theory-content">
+                    <p class="theory-text"><strong>1. 参数映射：</strong>已知阶数 n，我们可计算出电路中任意电感 L<sub>k</sub> 和任意电容 C<sub>m</sub> 对应的归一化原型常数 g<sub>k</sub> 与 g<sub>m</sub>。</p>
+                    <p class="theory-text"><strong>2. 逆向推算频率（相乘消去阻抗）：</strong>将电感与电容方程相乘，抵消特性阻抗 Z<sub>0</sub> 求解 f<sub>c</sub>：</p>
+                    <div class="formula-box">
+                        f<sub>c</sub> = <span class="fraction"><span>1</span><span class="divider"></span><span>2&pi;</span></span> &radic;<span class="fraction"><span>g<sub>k</sub> &times; g<sub>m</sub></span><span class="divider"></span><span>L<sub>k</sub> &times; C<sub>m</sub></span></span>
+                    </div>
+                    <p class="theory-text"><strong>3. 逆向推算阻抗（相除消去频率）：</strong>将电感方程除以电容方程，抵消频率项求解 Z<sub>0</sub>：</p>
+                    <div class="formula-box">
+                        Z<sub>0</sub> = &radic;<span class="fraction"><span>L<sub>k</sub> &times; g<sub>m</sub></span><span class="divider"></span><span>C<sub>m</sub> &times; g<sub>k</sub></span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main> 
     
-    <script type="text/javascript" src="./js/calculate.js"></script>  
+    <script type="text/javascript" src="./js/calculate.js"></script> 
 </body>
 </html>
