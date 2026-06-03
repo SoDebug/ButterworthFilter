@@ -1,115 +1,241 @@
+/* Material Design 3 色彩令牌 (Tokens) */
 :root {
-	--primary-color: #0056b3;
-	--bg-color: #f4f7f6;
-	--card-bg: #ffffff;
-	--text-color: #333333;
-	--border-color: #dddddd;
+    --md-sys-color-primary: #6750A4;
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #EADDFF;
+    --md-sys-color-on-primary-container: #21005D;
+    
+    --md-sys-color-background: #FEF7FF;
+    --md-sys-color-on-background: #1D1B20;
+    
+    --md-sys-color-surface: #FEF7FF;
+    --md-sys-color-surface-container-low: #F7F2FA;
+    --md-sys-color-surface-container: #F3EDF7;
+    --md-sys-color-surface-container-high: #ECE6F0;
+    --md-sys-color-on-surface: #1D1B20;
+    --md-sys-color-on-surface-variant: #49454F;
+    
+    --md-sys-color-outline: #79747E;
+    --md-sys-color-outline-variant: #CAC4D0;
 }
 
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	background-color: var(--bg-color);
-	color: var(--text-color);
-	line-height: 1.6;
-	margin: 0;
-	padding: 20px;
+    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    margin: 0;
+    padding: 24px 16px;
+    display: flex;
+    justify-content: center;
+    line-height: 1.5;
 }
 
+/* 主容器：MD3 卡片表现形式 */
 .container {
-	max-width: 800px;
-	margin: 0 auto;
-	background: var(--card-bg);
-	padding: 30px;
-	border-radius: 10px;
-	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 720px;
+    background-color: var(--md-sys-color-surface-container);
+    padding: 32px;
+    border-radius: 28px; /* MD3 规范超大圆角 */
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.header-icon {
+    font-size: 48px;
+    color: var(--md-sys-color-primary);
+    margin-bottom: 8px;
 }
 
 h1 {
-	text-align: center;
-	color: var(--primary-color);
+    margin: 0 0 8px 0;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--md-sys-color-on-surface);
+}
+
+.header p {
+    margin: 0;
+    color: var(--md-sys-color-on-surface-variant);
 }
 
 .form-group {
-	margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 label {
-	display: block;
-	font-weight: bold;
-	margin-bottom: 5px;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 8px;
 }
 
+/* MD3 轮廓型输入框变体 */
 .input-group {
-	display: flex;
-	gap: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+input[type="number"], select, .unit-suffix {
+    height: 56px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: 4px; /* MD3 text field 规范 */
+    font-size: 16px;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    transition: all 0.2s ease;
 }
 
 input[type="number"] {
-	flex: 1;
-	padding: 10px;
-	border: 1px solid var(--border-color);
-	border-radius: 5px;
-	font-size: 16px;
+    flex: 1;
 }
 
-select {
-	padding: 10px;
-	border: 1px solid var(--border-color);
-	border-radius: 5px;
-	font-size: 16px;
-	background-color: #fff;
+input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--md-sys-color-primary);
+    border-width: 2px;
+    padding: 0 15px; /* 补偿边框加粗导致的跳动 */
 }
 
-button {
-	display: block;
-	width: 100%;
-	padding: 12px;
-	background-color: var(--primary-color);
-	color: white;
-	border: none;
-	border-radius: 5px;
-	font-size: 18px;
-	cursor: pointer;
-	transition: background-color 0.3s;
+.unit-suffix {
+    background-color: var(--md-sys-color-surface-container-high);
+    border-color: var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
 }
 
-button:hover {
-	background-color: #004494;
+/* MD3 胶囊按钮 (Filled Button) */
+.md-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 48px;
+    margin-top: 32px;
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border: none;
+    border-radius: 100px; /* 胶囊形状 */
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.md-button:hover {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08));
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.md-button:active {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12));
 }
 
 .results {
-	margin-top: 30px;
-	display: none;
+    margin-top: 40px;
+    display: none;
+    animation: fadeIn 0.4s ease-out;
 }
 
-.topology {
-	margin-bottom: 30px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.topology h3 {
-	color: #0056b3;
-	border-bottom: 2px solid var(--border-color);
-	padding-bottom: 5px;
+.results h2 {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    color: var(--md-sys-color-on-surface);
 }
 
-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 15px;
+/* 结果卡片容器 */
+.topology-card {
+    background-color: var(--md-sys-color-surface-container-high);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
 }
 
-th, td {
-	padding: 12px;
-	text-align: left;
-	border-bottom: 1px solid var(--border-color);
+.topology-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
-th {
-	background-color: #f8f9fa;
+.topology-header span {
+    color: var(--md-sys-color-primary);
+}
+
+.topology-card h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
 }
 
 .note {
-	font-size: 0.9em;
-	color: #666;
-	margin-top: 10px;
+    font-size: 14px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin: 0 0 16px 0;
+}
+
+/* MD3 风格表格 */
+.table-container {
+    background-color: var(--md-sys-color-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 16px;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+th {
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface-variant);
+    background-color: var(--md-sys-color-surface-container-low);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+strong {
+    color: var(--md-sys-color-primary);
+    font-weight: 700;
+}
+
+/* 响应式适配 */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    .topology-card {
+        padding: 16px;
+    }
+    th, td {
+        padding: 12px 8px;
+    }
 }

@@ -1,70 +1,106 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
- <head> 
-  <meta charset="UTF-8" /> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-  <title>巴特沃斯低通滤波器 LC 参数计算器</title> 
-  <link rel="stylesheet" href="./css/Rendering.css" /> 
- </head> 
- <body> 
-  <div class="container"> 
-   <h1>巴特沃斯低通滤波器计算器</h1> 
-   <p>输入设计参数，生成对应 LC 梯形网络（Low-Pass）的电感（L）和电容（C）值。</p> 
-   <div class="form-group"> 
-    <label for="freq">截止频率 (fc)</label> 
-    <div class="input-group"> 
-     <input type="number" id="freq" placeholder="例如: 10" step="any" required="" /> 
-     <select id="freqUnit"> <option value="1">Hz</option> <option value="1e3">kHz</option> <option value="1e6" selected="">MHz</option> <option value="1e9">GHz</option> </select> 
-    </div> 
-   </div> 
-   <div class="form-group"> 
-    <label for="impedance">特性阻抗 (Z0)</label> 
-    <div class="input-group"> 
-     <input type="number" id="impedance" placeholder="例如: 50" value="50" step="any" required="" /> 
-     <select disabled=""> <option>Ω (欧姆)</option> </select> 
-    </div> 
-   </div> 
-   <div class="form-group"> 
-    <label for="order">滤波器阶数 (n)</label> 
-    <div class="input-group"> 
-     <input type="number" id="order" placeholder="例如: 3" value="3" min="1" max="20" step="1" required="" /> 
-    </div> 
-   </div> 
-   <button onclick="calculateFilter()">计算参数</button> 
-   <div class="results" id="results"> 
-    <h2>计算结果</h2> 
-    <div class="topology"> 
-     <h3>拓扑结构 1：首个元件为【串联电感】(T型起始)</h3> 
-     <p class="note">信号源 -&gt; 串联L1 -&gt; 并联C2 -&gt; 串联L3 -&gt; ... -&gt; 负载</p> 
-     <table id="tableTop1"> 
-      <thead> 
-       <tr> 
-        <th>元件位号 (k)</th> 
-        <th>元件类型</th> 
-        <th>计算值</th> 
-        <th>归一化参数 (gk)</th> 
-       </tr> 
-      </thead> 
-      <tbody></tbody> 
-     </table> 
-    </div> 
-    <div class="topology"> 
-     <h3>拓扑结构 2：首个元件为【并联电容】(π型起始)</h3> 
-     <p class="note">信号源 -&gt; 并联C1 -&gt; 串联L2 -&gt; 并联C3 -&gt; ... -&gt; 负载</p> 
-     <table id="tableTop2"> 
-      <thead> 
-       <tr> 
-        <th>元件位号 (k)</th> 
-        <th>元件类型</th> 
-        <th>计算值</th> 
-        <th>归一化参数 (gk)</th> 
-       </tr> 
-      </thead> 
-      <tbody></tbody> 
-     </table> 
-    </div> 
-   </div> 
-  </div> 
-  <script type="text/javascript" src="./js/calculate.js"></script>  
- </body>
+<head> 
+    <meta charset="UTF-8" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+    <title>巴特沃斯低通滤波器计算器 - MD3</title> 
+    
+    <!-- 引入 MD3 标准字体 Roboto 和 Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="./css/Rendering.css" /> 
+</head> 
+<body> 
+    <main class="container"> 
+        <div class="header">
+            <span class="material-symbols-outlined header-icon">graphic_eq</span>
+            <h1>巴特沃斯滤波器</h1> 
+            <p>输入设计参数，生成对应 LC 梯形网络的电感和电容值。</p> 
+        </div>
+
+        <div class="form-container">
+            <div class="form-group"> 
+                <label for="freq">截止频率 (fc)</label> 
+                <div class="input-group"> 
+                    <input type="number" id="freq" placeholder="例如: 10" step="any" required /> 
+                    <select id="freqUnit"> 
+                        <option value="1">Hz</option> 
+                        <option value="1e3">kHz</option> 
+                        <option value="1e6" selected>MHz</option> 
+                        <option value="1e9">GHz</option> 
+                    </select> 
+                </div> 
+            </div> 
+            
+            <div class="form-group"> 
+                <label for="impedance">特性阻抗 (Z0)</label> 
+                <div class="input-group"> 
+                    <input type="number" id="impedance" placeholder="例如: 50" value="50" step="any" required /> 
+                    <div class="unit-suffix">Ω (欧姆)</div>
+                </div> 
+            </div> 
+            
+            <div class="form-group"> 
+                <label for="order">滤波器阶数 (n)</label> 
+                <div class="input-group"> 
+                    <input type="number" id="order" placeholder="例如: 3" value="3" min="1" max="20" step="1" required /> 
+                </div> 
+            </div> 
+        </div>
+
+        <button class="md-button" onclick="calculateFilter()">
+            <span class="material-symbols-outlined">calculate</span>
+            计算参数
+        </button> 
+        
+        <div class="results" id="results"> 
+            <h2>计算结果</h2> 
+            
+            <div class="topology-card"> 
+                <div class="topology-header">
+                    <span class="material-symbols-outlined">account_tree</span>
+                    <h3>拓扑结构 1：T型起始 (首元件串联电感)</h3> 
+                </div>
+                <p class="note">信号源 → 串联L1 → 并联C2 → 串联L3 → ... → 负载</p> 
+                <div class="table-container">
+                    <table id="tableTop1"> 
+                        <thead> 
+                            <tr> 
+                                <th>位号 (k)</th> 
+                                <th>元件类型</th> 
+                                <th>计算值</th> 
+                                <th>归一化 (gk)</th> 
+                            </tr> 
+                        </thead> 
+                        <tbody></tbody> 
+                    </table> 
+                </div>
+            </div> 
+            
+            <div class="topology-card"> 
+                <div class="topology-header">
+                    <span class="material-symbols-outlined">hub</span>
+                    <h3>拓扑结构 2：π型起始 (首元件并联电容)</h3> 
+                </div>
+                <p class="note">信号源 → 并联C1 → 串联L2 → 并联C3 → ... → 负载</p> 
+                <div class="table-container">
+                    <table id="tableTop2"> 
+                        <thead> 
+                            <tr> 
+                                <th>位号 (k)</th> 
+                                <th>元件类型</th> 
+                                <th>计算值</th> 
+                                <th>归一化 (gk)</th> 
+                            </tr> 
+                        </thead> 
+                        <tbody></tbody> 
+                    </table> 
+                </div>
+            </div> 
+        </div> 
+    </main> 
+    
+    <script type="text/javascript" src="./js/calculate.js"></script>  
+</body>
 </html>
