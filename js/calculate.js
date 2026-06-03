@@ -111,8 +111,10 @@ function drawCircuitSVG(n, topologyType, values) {
         if (isSeries) {
             // 绘制串联电感
             svg += '<path d="M ' + x + ' ' + ySignal + ' c 5 -15, 15 -15, 20 0 c 5 -15, 15 -15, 20 0 c 5 -15, 15 -15, 20 0" stroke="' + stroke + '" stroke-width="2" fill="none" />';
-            svg += '<text x="' + (x + 30) + '" y="' + (ySignal - 24) + '" text-anchor="middle" font-size="13" font-weight="bold" fill="' + stroke + '">' + name + '</text>';
-            svg += '<text x="' + (x + 30) + '" y="' + (ySignal - 10) + '" text-anchor="middle" font-size="11" fill="#49454F">' + val + '</text>';
+            
+            // 【修改点】：将 y 坐标整体往上移动了大约 8 像素，彻底避开电感的弧线
+            svg += '<text x="' + (x + 30) + '" y="' + (ySignal - 32) + '" text-anchor="middle" font-size="13" font-weight="bold" fill="' + stroke + '">' + name + '</text>';
+            svg += '<text x="' + (x + 30) + '" y="' + (ySignal - 18) + '" text-anchor="middle" font-size="11" fill="#49454F">' + val + '</text>';
             x += 60;
         } else {
             // 绘制并联电容
