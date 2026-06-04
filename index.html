@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-    <title>巴特沃斯低通滤波器设计与反推工具 - MD3</title> 
+    <title>低通滤波器设计与反推工具 - MD3</title> 
     
     <!-- 引入 MD3 标准字体 Roboto 和 Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -24,6 +24,26 @@
             </div>
 
             <div class="form-container">
+                <!-- 滤波器类型选择 -->
+                <div class="form-group"> 
+                    <label for="filterType">滤波器类型</label> 
+                    <div class="input-group"> 
+                        <select id="filterType" style="flex: 1;" onchange="onFilterTypeChange()"> 
+                            <option value="butterworth" selected>巴特沃斯低通 (双拓扑)</option> 
+                            <option value="chebyshev">切比雪夫低通 (π型起始)</option> 
+                        </select> 
+                    </div> 
+                </div> 
+
+                <!-- 带内纹波输入 (选择切比雪夫时显示) -->
+                <div class="form-group" id="rippleGroup" style="display: none;"> 
+                    <label for="ripple">带内纹波 (Ap)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="ripple" placeholder="例如: 0.5" value="0.5" step="0.01" min="0.001" max="3" /> 
+                        <div class="unit-suffix">dB</div>
+                    </div> 
+                </div>
+
                 <div class="form-group"> 
                     <label for="freq">截止频率 (fc)</label> 
                     <div class="input-group"> 
@@ -51,6 +71,20 @@
                         <input type="number" id="orderForward" placeholder="例如: 3" value="3" min="1" max="20" step="1" required /> 
                     </div> 
                 </div> 
+
+                <!-- 指定频率衰减计算输入框 -->
+                <div class="form-group"> 
+                    <label for="testFreq">计算指定频率处的衰减 (可选)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="testFreq" placeholder="留空则不计算，例如: 15" step="any" /> 
+                        <select id="testFreqUnit"> 
+                            <option value="1">Hz</option> 
+                            <option value="1e3">kHz</option> 
+                            <option value="1e6" selected>MHz</option> 
+                            <option value="1e9">GHz</option> 
+                        </select> 
+                    </div> 
+                </div>
             </div>
 
             <button class="md-button" onclick="calculateFilter()">
@@ -61,10 +95,11 @@
             <div class="results" id="resultsForward"> 
                 <h2>正向设计结果</h2> 
                 
-                <div class="topology-card"> 
+                <!-- 拓扑1 (T型起始) 的容器 -->
+                <div class="topology-card" id="cardTop1"> 
                     <div class="topology-header">
                         <span class="material-symbols-outlined">account_tree</span>
-                        <h3>拓扑结构 1：T型起始 (首元件串联电感)</h3> 
+                        <h3 id="titleTop1">拓扑结构 1：T型起始 (首元件串联电感)</h3> 
                     </div>
                     <!-- 电路图动态生成容器 -->
                     <div class="circuit-diagram" id="diagramTop1"></div>
@@ -83,10 +118,11 @@
                     </div>
                 </div> 
                 
-                <div class="topology-card"> 
+                <!-- 拓扑2 (π型起始) 的容器 -->
+                <div class="topology-card" id="cardTop2"> 
                     <div class="topology-header">
                         <span class="material-symbols-outlined">hub</span>
-                        <h3>拓扑结构 2：π型起始 (首元件并联电容)</h3> 
+                        <h3 id="titleTop2">拓扑结构 2：π型起始 (首元件并联电容)</h3> 
                     </div>
                     <!-- 电路图动态生成容器 -->
                     <div class="circuit-diagram" id="diagramTop2"></div>
@@ -104,15 +140,31 @@
                         </table> 
                     </div>
                 </div> 
+
+                <!-- 特定频率衰减值展示卡片 -->
+                <div class="topology-card" id="cardFreqResponse" style="display: none;">
+                    <div class="topology-header">
+                        <span class="material-symbols-outlined">analytics</span>
+                        <h3>特定频率衰减分析</h3>
+                    </div>
+                    <div class="table-container" style="padding: 20px; background-color: var(--md-sys-color-surface);">
+                        <p style="margin: 0; font-size: 14px; color: var(--md-sys-color-on-surface-variant);">
+                            在指定测试频率 <strong id="resTestFreqStr">-</strong> 处：
+                        </p>
+                        <p style="margin: 8px 0 0 0; font-size: 20px; color: var(--md-sys-color-primary); font-weight: bold;">
+                            计算所得衰减值约为：<span id="resAttenuation">-</span> dB
+                        </p>
+                    </div>
+                </div>
             </div> 
 
-            <!-- ================= 已恢复：左侧正向推算理论方法 ================= -->
+            <!-- 左侧正向推算理论方法 -->
             <div class="theory-card" style="margin-top: 32px;">
                 <div class="topology-header">
                     <span class="material-symbols-outlined">menu_book</span>
                     <h3>正向设计原理与方法</h3>
                 </div>
-                <div class="theory-content">
+                <div class="theory-content" id="theoryContentForward">
                     <p class="theory-text"><strong>1. 最大平坦响应：</strong>巴特沃斯低通滤波器（Butterworth Filter）具有“最大平坦度”特性，其通带内频响最为平坦，无纹波；阻带内单调衰减（每阶衰减约为 -20dB/十倍频）。</p>
                     <p class="theory-text"><strong>2. 归一化原型参数 (g<sub>k</sub>)：</strong>先计算截止频率为 1 rad/s、系统阻抗为 1 Ω 时的无量纲原型元件值：</p>
                     <div class="formula-box">
@@ -137,6 +189,26 @@
             </div>
 
             <div class="form-container">
+                <!-- 逆向滤波器类型选择 -->
+                <div class="form-group"> 
+                    <label for="filterTypeReverse">滤波器原型</label> 
+                    <div class="input-group"> 
+                        <select id="filterTypeReverse" style="flex: 1;" onchange="onReverseFilterTypeChange()"> 
+                            <option value="butterworth" selected>巴特沃斯低通</option> 
+                            <option value="chebyshev">切比雪夫低通</option> 
+                        </select> 
+                    </div> 
+                </div> 
+
+                <!-- 逆向带内纹波输入 -->
+                <div class="form-group" id="rippleGroupReverse" style="display: none;"> 
+                    <label for="rippleReverse">带内纹波 (Ap)</label> 
+                    <div class="input-group"> 
+                        <input type="number" id="rippleReverse" placeholder="例如: 0.5" value="0.5" step="0.01" min="0.001" max="3" /> 
+                        <div class="unit-suffix">dB</div>
+                    </div> 
+                </div>
+
                 <div class="form-group"> 
                     <label for="orderReverse">已知滤波器阶数 (n)</label> 
                     <div class="input-group"> 
@@ -193,7 +265,7 @@
                 <p class="note" style="text-align: center; margin-top: 0;">提示：若反算频率含碎数，说明原设计极有可能使用了妥协的标准标称元器件。</p>
             </div> 
 
-            <!-- ================= 已恢复并详化的：右侧逆向反推理论方法 ================= -->
+            <!-- 右侧逆向反推理论方法 -->
             <div class="theory-card" style="margin-top: 32px;">
                 <div class="topology-header">
                     <span class="material-symbols-outlined">menu_book</span>
